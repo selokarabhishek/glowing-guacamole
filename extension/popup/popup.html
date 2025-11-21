@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual AI Assistant</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>Visual AI Assistant</h1>
+      <div class="status-bar">
+        <span id="status" class="status disconnected">Disconnected</span>
+        <select id="provider-select" class="provider-select">
+          <option value="">Loading...</option>
+        </select>
+      </div>
+    </header>
+
+    <!-- Input Section -->
+    <section class="input-section">
+      <label for="prompt">What would you like to know?</label>
+      <textarea
+        id="prompt"
+        placeholder="e.g., 'What forms are on this page?', 'Help me fill out this form', 'What is this page about?'"
+        rows="3"
+      ></textarea>
+
+      <div class="button-group">
+        <button id="analyze-btn" class="btn btn-primary">
+          <span class="btn-icon">🔍</span>
+          Analyze Page
+        </button>
+        <button id="extract-btn" class="btn btn-secondary">
+          <span class="btn-icon">📋</span>
+          Extract Forms
+        </button>
+      </div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="use-memory" checked>
+        Use memory context
+      </label>
+    </section>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Analyzing page...</p>
+    </div>
+
+    <!-- Results Section -->
+    <section id="results" class="results-section hidden">
+      <div class="results-header">
+        <h2>Analysis Results</h2>
+        <button id="close-results" class="btn-close">&times;</button>
+      </div>
+
+      <div id="analysis-content" class="analysis-content"></div>
+
+      <!-- Detected Fields -->
+      <div id="fields-section" class="fields-section hidden">
+        <h3>Detected Form Fields</h3>
+        <div id="fields-list" class="fields-list"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button id="save-memory-btn" class="btn btn-success">
+          <span class="btn-icon">💾</span>
+          Save to Memory
+        </button>
+      </div>
+
+      <!-- Metadata -->
+      <div id="metadata" class="metadata"></div>
+    </section>
+
+    <!-- Memory Stats -->
+    <footer id="footer" class="footer">
+      <span id="memory-stats">Memory: 0 entries</span>
+      <button id="clear-memory-btn" class="btn-link">Clear Memory</button>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
