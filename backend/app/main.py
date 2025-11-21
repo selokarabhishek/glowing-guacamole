@@ -15,12 +15,17 @@ app = FastAPI(
 )
 
 # Configure CORS for browser extension
+# SECURITY: Restrict to extension only in production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for extension
+    allow_origins=[
+        "chrome-extension://*",  # Chrome extensions
+        "moz-extension://*",     # Firefox extensions
+        "http://localhost:*",    # Development only
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "DELETE", "PUT"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 

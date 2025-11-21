@@ -1,6 +1,6 @@
 """Pydantic schemas for API requests and responses."""
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 # VLM Schemas
@@ -40,6 +40,69 @@ class AnalyzeRequest(BaseModel):
     url: Optional[str] = Field(None, description="URL of the page being analyzed")
     use_memory: bool = Field(True, description="Whether to use memory context")
     provider: Optional[str] = Field(None, description="VLM provider override")
+
+    @field_validator('prompt')
+    @classmethod
+    def validate_prompt(cls, v: str) -> str:
+        """Validate and sanitize prompt input."""
+        if not v or not v.strip():
+            return "Analyze this page"
+
+        # Length check
+        if len(v) > 5000:
+            raise ValueError("Prompt too long (max 5000 characters)")
+
+        # Check for suspicious prompt injection patterns
+        suspicious_patterns = [
+            "ignore previous instructions",
+            "ignore above",
+            "disregard previous",
+            "forget everything",
+            "new instructions:",
+            "system:",
+            "admin mode",
+            "you are now",
+        ]
+
+        v_lower = v.lower()
+        for pattern in suspicious_patterns:
+            if pattern in v_lower:
+                raise ValueError(f"Suspicious pattern detected in prompt: '{pattern}'")
+
+        return v.strip()
+
+    @field_validator('image_base64')
+    @classmethod
+    def validate_image(cls, v: str) -> str:
+        """Validate base64 image data."""
+        if not v:
+            raise ValueError("Image data is required")
+
+        # Remove data URL prefix if present
+        if v.startswith("data:"):
+            v = v.split(",", 1)[1] if "," in v else v
+
+        # Basic length check (images should be substantial)
+        if len(v) < 100:
+            raise ValueError("Image data too small - may be invalid")
+
+        if len(v) > 10_000_000:  # ~7.5MB
+            raise ValueError("Image data too large (max ~7.5MB)")
+
+        return v
+
+    @field_validator('provider')
+    @classmethod
+    def validate_provider(cls, v: Optional[str]) -> Optional[str]:
+        """Validate provider name."""
+        if v is None:
+            return v
+
+        allowed_providers = ["claude", "openai", "ollama"]
+        if v.lower() not in allowed_providers:
+            raise ValueError(f"Invalid provider. Must be one of: {allowed_providers}")
+
+        return v.lower()
 
 
 class AnalyzeResponse(BaseModel):

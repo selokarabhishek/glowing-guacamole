@@ -123,6 +123,21 @@ function loadSavedProvider() {
   });
 }
 
+// Check if page is sensitive
+function isSensitivePage(url) {
+  const sensitivePatterns = [
+    /banking|bank|chase|wellsfargo|bofa|citibank/i,
+    /paypal|venmo|cashapp|stripe|square/i,
+    /login|signin|password|auth|sso/i,
+    /checkout|payment|credit-card|billing/i,
+    /medical|health|patient|prescription/i,
+    /ssn|tax|irs|w2|w9|legal/i,
+    /mail\.google|outlook|yahoo\.mail|proton/i,
+  ];
+
+  return sensitivePatterns.some(pattern => pattern.test(url));
+}
+
 // Capture screenshot
 async function captureScreenshot() {
   try {
@@ -146,6 +161,26 @@ async function analyzeCurrentPage() {
   if (backendStatus !== 'connected') {
     alert('Backend is not connected. Please start the backend server.');
     return;
+  }
+
+  // Security check: Warn about sensitive pages
+  if (isSensitivePage(currentUrl)) {
+    const provider = providerSelectEl.value || 'cloud provider';
+    const warningMessage = `⚠️ SECURITY WARNING\n\n` +
+      `This page may contain sensitive information (login, banking, payment, etc.).\n\n` +
+      `Screenshots will be:\n` +
+      `• Sent to ${provider === 'ollama' ? 'your local Ollama server' : provider + ' cloud service'}\n` +
+      `• May be logged by the AI provider\n` +
+      `${useMemoryEl.checked ? '• Stored in local memory database\n' : ''}` +
+      `\nRECOMMENDATIONS:\n` +
+      `• Use Ollama (local) for sensitive pages\n` +
+      `• Disable "Use memory context" below\n` +
+      `• Avoid pages with visible passwords\n\n` +
+      `Continue analysis anyway?`;
+
+    if (!confirm(warningMessage)) {
+      return;
+    }
   }
 
   const prompt = promptEl.value.trim() || 'Analyze this page and identify all form fields with their details.';
@@ -252,26 +287,40 @@ async function extractFormFields() {
   }
 }
 
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 // Display results
 function displayResults(result) {
-  // Show analysis
+  // Show analysis (safe - using textContent)
   analysisContentEl.textContent = result.analysis;
 
-  // Show form fields if any
+  // Show form fields if any (with XSS protection)
   if (result.form_fields && result.form_fields.length > 0) {
     fieldsListEl.innerHTML = '';
     result.form_fields.forEach(field => {
       const fieldEl = document.createElement('div');
       fieldEl.className = 'field-item';
-      fieldEl.innerHTML = `
-        <strong>${field.label}</strong>
-        <div class="field-meta">
-          Type: ${field.field_type} |
-          Selector: ${field.selector} |
-          Required: ${field.required ? 'Yes' : 'No'}
-          ${field.suggested_value ? ` | Suggested: ${field.suggested_value}` : ''}
-        </div>
-      `;
+
+      // Create label element safely
+      const labelEl = document.createElement('strong');
+      labelEl.textContent = field.label;
+
+      // Create meta element safely
+      const metaEl = document.createElement('div');
+      metaEl.className = 'field-meta';
+      metaEl.textContent = `Type: ${field.field_type} | Selector: ${field.selector} | Required: ${field.required ? 'Yes' : 'No'}`;
+
+      if (field.suggested_value) {
+        metaEl.textContent += ` | Suggested: ${field.suggested_value}`;
+      }
+
+      fieldEl.appendChild(labelEl);
+      fieldEl.appendChild(metaEl);
       fieldsListEl.appendChild(fieldEl);
     });
     fieldsSectionEl.classList.remove('hidden');
@@ -279,13 +328,8 @@ function displayResults(result) {
     fieldsSectionEl.classList.add('hidden');
   }
 
-  // Show metadata
-  metadataEl.innerHTML = `
-    Provider: ${result.provider} |
-    Model: ${result.model} |
-    ${result.tokens_used ? `Tokens: ${result.tokens_used}` : ''} |
-    Memory used: ${result.memory_context_used ? 'Yes' : 'No'}
-  `;
+  // Show metadata (safe - using textContent)
+  metadataEl.textContent = `Provider: ${result.provider} | Model: ${result.model} | ${result.tokens_used ? `Tokens: ${result.tokens_used}` : ''} | Memory used: ${result.memory_context_used ? 'Yes' : 'No'}`;
 
   resultsEl.classList.remove('hidden');
 }

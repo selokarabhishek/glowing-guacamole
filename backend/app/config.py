@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     chroma_persist_dir: str = "./data/chroma"
     embedding_model: str = "all-MiniLM-L6-v2"
 
+    # Security Settings
+    api_token: str = ""  # Optional auth token - generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
+    require_auth: bool = False  # Set to True to require authentication
+
     # Analysis Settings
     max_tokens: int = 4096
     system_prompt: str = """You are a visual UI analysis expert. Analyze the provided screenshot and:
