@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "FormFill AI - Auto-fill web forms instantly",
+  "short_name": "FormFill AI",
+  "version": "2.0.0",
+  "description": "Fill any web form 10× faster with AI. Auto-fill job applications, contact forms, and more in seconds.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup-v2.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "FormFill AI - Fill forms 10× faster"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "detect-forms": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F",
+        "mac": "Command+Shift+F"
+      },
+      "description": "Detect forms on current page"
+    },
+    "auto-fill": {
+      "suggested_key": {
+        "default": "Ctrl+Enter",
+        "mac": "Command+Enter"
+      },
+      "description": "Auto-fill detected form"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "homepage_url": "https://formfill.ai"
+}

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FormFill AI - Auto-fill any web form instantly</title>
+  <link rel="stylesheet" href="popup-v2.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-top">
+        <div class="logo">
+          <div class="logo-icon">⚡</div>
+          <div class="logo-text">FormFill AI</div>
+        </div>
+        <div class="header-actions">
+          <div id="status-indicator" class="status-indicator">
+            <span class="status-dot"></span>
+            <span id="status-text">Connecting...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Badge (shown when user has history) -->
+      <div id="time-saved-badge" class="stats-badge hidden">
+        <span>⏱️</span>
+        <span>You've saved <strong id="time-saved">0 hours</strong> this week</span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Welcome State (shown on first use) -->
+      <section id="welcome-state" class="hero-section hidden">
+        <h1 class="hero-title">Fill forms 10× faster</h1>
+        <p class="hero-subtitle">AI that learns your data and fills any web form in seconds</p>
+
+        <button class="btn btn-primary btn-lg btn-full">
+          <span>🚀</span>
+          <span>Detect Forms on This Page</span>
+          <kbd>⌘⇧F</kbd>
+        </button>
+
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-value">5sec</div>
+            <div class="stat-label">Average fill time</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">98%</div>
+            <div class="stat-label">Accuracy</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Form Detected State -->
+      <section id="form-detected-state" class="hidden">
+        <div class="form-detected animate-slide-up">
+          <div class="form-detected-header">
+            <div>
+              <span class="form-type-badge">
+                <span>📋</span>
+                <span id="form-type">Contact Form</span>
+              </span>
+            </div>
+            <span class="confidence-badge" id="field-count">8 fields detected</span>
+          </div>
+
+          <!-- Field Previews -->
+          <div id="fields-preview" class="form-fields-preview">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Actions -->
+          <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <button id="auto-fill-btn" class="btn btn-primary btn-lg" style="flex: 1;">
+              <span>✨</span>
+              <span>Auto-Fill Form</span>
+              <kbd>⌘↵</kbd>
+            </button>
+            <button id="customize-btn" class="btn btn-secondary btn-icon">
+              <span>⚙️</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+          <button id="save-template-btn" class="btn btn-ghost" style="flex: 1; font-size: 13px;">
+            <span>💾</span>
+            <span>Save as Template</span>
+          </button>
+          <button id="learn-more-btn" class="btn btn-ghost" style="flex: 1; font-size: 13px;">
+            <span>📚</span>
+            <span>Use Template</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- No Forms State -->
+      <section id="no-forms-state" class="hero-section hidden">
+        <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+        <h2 class="hero-title" style="font-size: 18px;">No forms detected</h2>
+        <p class="hero-subtitle">Navigate to a page with a form to get started</p>
+
+        <button id="analyze-anyway-btn" class="btn btn-secondary btn-full">
+          <span>🔍</span>
+          <span>Analyze Page Anyway</span>
+        </button>
+      </section>
+
+      <!-- Loading State -->
+      <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-text">Detecting forms...</div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto">
+      <div class="footer-content">
+        <div style="display: flex; gap: 16px;">
+          <a href="#" id="templates-link" class="footer-link">Templates</a>
+          <a href="#" id="settings-link" class="footer-link">Settings</a>
+          <a href="#" id="upgrade-link" class="footer-link">⭐ Upgrade</a>
+        </div>
+        <div>
+          <kbd>⌘/</kbd> <span style="margin-left: 4px; color: var(--color-text-tertiary);">Help</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="popup-v2.js"></script>
+</body>
+</html>
